@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* Manual toggle: ThemeProvider adds `dark` on <html>. Tailwind v4 defaults `dark:` to
+   prefers-color-scheme; override so `dark:` follows the class (see tailwindcss.com/docs/dark-mode). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens — light / dark via `.dark` on <html> */
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-500: oklch(0.55 0.18 250);
+  --color-brand-600: oklch(0.48 0.19 250);
+  --color-surface: oklch(0.99 0.005 250);
+  --color-surface-dark: oklch(0.16 0.02 250);
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+  body {
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen;
+  }
+}

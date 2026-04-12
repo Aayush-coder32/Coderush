@@ -1,0 +1,36 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    environment:
+      PORT: 5000
+      MONGODB_URI: mongodb://mongo:27017/smart_campus_os
+      JWT_SECRET: change_me_in_production_use_long_random
+      CLIENT_URL: http://localhost:8080
+    depends_on:
+      - mongo
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        # Browser hits the SPA on :8080; Socket.io is proxied by nginx to the API.
+        VITE_SOCKET_URL: http://localhost:8080
+    restart: unless-stopped
+    ports:
+      - '8080:80'
+    depends_on:
+      - api
+
+volumes:
+  mongo_data:
