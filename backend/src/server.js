@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   const server = http.createServer(app);
   initSocket(server);
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Smart Campus OS API + WebSocket → http://127.0.0.1:${PORT} (and http://localhost:${PORT})`);
-  });
+ server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});
 });
