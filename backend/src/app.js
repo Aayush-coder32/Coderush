@@ -3,26 +3,31 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const routes = require('./routes');
+const productionConfig = require('./config/productionConfig');
 
 const app = express();
 
-// Security headers
+// Security headers (production-ready)
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
-// CORS — allow local Vite dev server
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3001',
-    credentials: true,
-  })
-);
+// CORS configuration
+const corsOrigin = process.env.CLIENT_URL || 'http://localhost:3001';
+const corsConfig = process.env.NODE_ENV === 'production'
+  ? productionConfig.corsOptions
+  : { origin: corsOrigin, credentials: true };
 
-// Stripe webhook would need raw body on a dedicated route — not implemented in this demo build
+app.use(cors(corsConfig));
+
+// Body parser with size limits
 app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
-// Basic rate limit for auth routes
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+// Rate limiting for auth routes (strict in production)
+const authLimitConfig = process.env.NODE_ENV === 'production'
+  ? productionConfig.authRateLimitOptions
+  : { windowMs: 15 * 60 * 1000, max: 100 };
+
+const authLimiter = rateLimit(authLimitConfig);
 app.use('/api/auth', authLimiter);
 
 app.use('/api', routes);
@@ -36,7 +41,11 @@ app.use((req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ success: false, message: err.message || 'Server error' });
+  const status = err.status || 500;
+  const message = process.env.NODE_ENV === 'production'
+    ? 'Internal server error'
+    : err.message || 'Server error';
+  res.status(status).json({ success: false, message });
 });
 
 module.exports = app;

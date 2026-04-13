@@ -4,10 +4,14 @@
  */
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+const validateEnv = require('./utils/envValidator');
 const http = require('http');
 const app = require('./app');
 const connectDB = require('./config/db');
 const { initSocket } = require('./sockets');
+
+// Validate environment before starting
+validateEnv();
 
 const PORT = process.env.PORT || 5000;
 

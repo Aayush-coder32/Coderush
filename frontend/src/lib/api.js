@@ -4,7 +4,7 @@ import axios from 'axios'
  * Shared Axios client (FYP-style `lib/`). Proxies `/api` → backend in dev.
  */
 const client = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: { 'Content-Type': 'application/json' },
 })
 
