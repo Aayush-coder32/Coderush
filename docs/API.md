@@ -1,6 +1,8 @@
 # Smart Campus OS — REST API
 
-Base URL (local): `http://localhost:5000/api`
+<!-- Base URL (local): `http://localhost:5000/api` -->
+
+Base URL (local):`https://coderush-9.onrender.com`
 
 All JSON bodies use `Content-Type: application/json` unless noted. Protected routes need:
 
